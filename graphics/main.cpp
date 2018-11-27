@@ -25,59 +25,60 @@ void display()
     predisplay(); // 描画開始時に必ず呼ぶ関数。消してはならない
     /***** 以降を編集する *****/
 
-    // キーボード入力に応じた処理
-    if (key == 'q' || key == 'Q')
-    {
-        exit(0);
-    }
-
-    double time = getTime(); // 経過時間を秒単位で取得
-
     /////
     ///// 2Dパート開始
     glDisable(GL_LIGHTING);  // 消してはいけない
+    float WHEN=1;//全てを統べる変数(1~24で)
+    
+    if(WHEN<1||WHEN>24){
+        exit(0);
+    }
+    
+    float NIGHT[3]={0.2,0.2,0.2};
+    float TWIGHT[3]={1,0.7,0.6};
+    float BEFORENOON[3]={0.8,0.9,1};
+    float AFTERNOON[3]={0.6,0.7,1};
+    
+    
+    //「プログラムで図形描く講義に大体登場するあれ」で囲いを作る。
+    //WHENの値で色と密度が変わる。
+    int i;
+    glLineWidth(2);
+    for(i=-100;i<200;i=i+WHEN){
+        //WHENによって色が変わる
+        if(WHEN>=4&&WHEN<=6){glColor3d(TWIGHT[0],TWIGHT[1],TWIGHT[2]);}
+        else if(WHEN>=7&&WHEN<=10){glColor3d(BEFORENOON[0],BEFORENOON[1],BEFORENOON[2]);}
+        else if(WHEN>=11&&WHEN<=15){glColor3d(AFTERNOON[0],AFTERNOON[1],AFTERNOON[2]);}
+        else if(WHEN>=16&&WHEN<=18){glColor3d(TWIGHT[0],TWIGHT[1]-0.2,TWIGHT[2]-0.2);}
+        else {glColor3d(NIGHT[0],NIGHT[1],NIGHT[2]);}
+        
+        glBegin(GL_LINES);
+        glVertex3d(-100+i,100,0);
+        glVertex3d(100,100-i,0);
+        glVertex3d(-100,100-i,0);
+        glVertex3d(-100+i,-100,0);
+        glVertex3d(-100,100-i,0);
+        glVertex3d(100-i,100,0);
+        glVertex3d(-100+i,-100,0);
+        glVertex3d(100,-100+i,0);
+        glEnd();
+    }
 
-    // 画面を横切る線
-    //
-    // 引数に線の太さを指定（浮動小数）
-    glLineWidth(10.0);
-    // 線の色：引数は先頭から[Red, Green, Blue] を指定
-    glColor3d(1.0, 1.0, 1.0);
-    // 線の描画
-    glBegin(GL_LINES);        // 線描はじめ
-    glVertex3d(-100.0, 0, 0); // 始端 [x, y, z]
-    glVertex3d(100.0, 0, 0);  // 終端 [x, y, z]
-    glEnd();                  // 線描おわり
-
-    /////
-    ///// 3Dパート開始
-    glEnable(GL_LIGHTING);    // 消してはいけない
-
-    // マウスカーソルについてくるティーポット
-    glPushMatrix();
-    //
-    // ティーポットの位置指定 [x, y, z]
-    glTranslated(mousePosX, mousePosY, 0);
-    // ティーポットの回転 [回転角度(degree), 回転軸x, 回転軸y, 回転軸z]
-    glRotated(time * 60.0, 0, 0, 1.0);
-    // ティーポットの色
-    float teapot1Color[4] = { 1.0, 0.2, 0.2, 1.0 };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, teapot1Color);
-    // ティーポットの描画。引数には大きさを指定
-    glutSolidTeapot(20.0);
-    //
-    glPopMatrix();
-
-    // 画面を横方向に往復している半透明ドーナッツ
-    glPushMatrix();
-    double px = 80.0 * sin(time * 2.0);
-    glTranslated(px, 0, 0);
-    glRotated(time * 100.0, 0, 1.0, 0);
-    float teapot2Color[4] = { 0.2, 0.2, 1.0, 0.5 };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, teapot2Color);
-    glutSolidTorus(5.0, 20.0, 50, 50); // 引数には輪の太さと環の大きさ、あとは適当に50を2つ
-    glPopMatrix();
-
+    //長針
+    glBegin(GL_LINES);
+    glColor3d(1.0,1.0,1.0);
+    glVertex3d(0,0,0);
+    glVertex3d(0,50,0);
+    glEnd();
+    
+    //短針 WHENの値で角度が変わる
+    float CLOCK=WHEN*15*2*3.14/180;
+    glBegin(GL_LINES);
+    glColor3d(1.0,1.0,1.0);
+    glVertex3d(0,0,0);
+    glVertex3d(sin(CLOCK)*30,cos(CLOCK)*30,0);
+    glEnd();
+    
     /***** ここまで編集する *****/
     postdisplay(); // 描画終了時に必ず呼ぶ関数。消してはならない
 }
